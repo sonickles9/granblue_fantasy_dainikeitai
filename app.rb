@@ -8,9 +8,11 @@ require 'webrick/httpproxy'
 require 'pathname'
 require 'erb'
 require 'pp'
+require 'open-uri'
 
 def target_uri? uri
-  uri.host =~ %r`gbf\..+\.mbga\.jp`
+  hst = uri.to_s
+  hst =~ %r`http\:\/\/(gbf.*|game.*)(\.mbga|\.granbluefantasy)\.jp`
 end
 
 def target_content? res
@@ -22,7 +24,8 @@ def valid_content? res
 end
 
 def cache_path uri
-  Pathname.new "./cache/#{ ERB::Util.url_encode uri.to_s }"
+  filename = uri.to_s.sub(/http\:\/\/(gbf.*|game.*)(\.mbga\.jp|\.granbluefantasy\.jp)/, "")
+  Pathname.new "./cache/#{ ERB::Util.url_encode filename }"
 end
 
 
@@ -34,16 +37,25 @@ end
 handler = ->(req, res) {
   if target_uri?(req.request_uri) && target_content?(res) && valid_content?(res)
     cache_path = cache_path req.request_uri
-    File.write(cache_path, res.body) unless File.exists? cache_path
-    puts h "cache created: #{ req.unparsed_uri }", :blue
+#	if !File.exists? cache_path
+#	open(cache_path, 'wb') do |fo|
+#	  fo.print open(req.unparsed_uri.gsub(/\?.*$/, "")).read
+#    end
+	File.write(cache_path, res.body) unless File.exists? cache_path
+	puts h "cache created: #{ req.unparsed_uri }", :blue
+	res.body = File.read cache_path
+    raise WEBrick::HTTPStatus::OK
+#	end
   end
 }
 
 callback = ->(req, res) {
   cache_path = cache_path req.request_uri
   if target_uri?(req.request_uri) && File.exists?(cache_path)
+	res["Access-Control-Allow-Origin"] = "*"
+	res.body = File.read cache_path
+	res.filename = cache_path
     puts h "cache found: #{ req.unparsed_uri }", :green
-    res.body = File.read cache_path
     raise WEBrick::HTTPStatus::OK
   end
 }
