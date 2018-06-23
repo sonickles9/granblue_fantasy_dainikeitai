@@ -11,10 +11,21 @@ Because this game has too many assets, so too slow to play confortably.
 
 ## How to use
 
+For PC version (app.rb)
 - `bundle install`
 - `ruby ./app.rb`
 - Set `127.0.0.1:8080` to your OS or web browser's proxy setting
-- Open `http://gbf.game.mbga.jp/` with your web browser
+- Open `http://game.granbluefantasy.jp/` with your web browser
+- Enjoy!
+
+For Android version (android-app.rb)
+- Install Ruboto Core and Ruboto IRB
+- Copy `android-app.rb` to your device's internal storage
+- In Ruboto IRB, tap the three-dot menu and select Import
+- Select the file you just copied
+- Tap the three-dot menu again and select Execute
+- Set `127.0.0.1:8080` to your browser's proxy (requires a compatible browser, I recommend Lightning) or if rooted, use ProxyDroid
+- Open `http://game.granbluefantasy.jp/` or `http://gbf.game.mbga.jp/` with your web browser
 - Enjoy!
 
 
